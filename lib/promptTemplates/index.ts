@@ -1,11 +1,11 @@
-import { defaultPrompt } from './default'
-import { kansaiPrompt } from './kansai'
-import { catPrompt } from './cat'
-import { internetOldPrompt } from './internetOld'
+import { kansaiPrompt } from './kansai';
+import { nekojinPrompt } from './nekojin';
+import { roujinPrompt } from './roujin';
+import { downerPrompt } from './downer';
 
 export const prompts = {
-  default: defaultPrompt,
   kansai: kansaiPrompt,
-  cat: catPrompt,
-  internetOld: internetOldPrompt,
-}
+  nekojin: nekojinPrompt,
+  roujin: roujinPrompt,
+  downer: downerPrompt,
+} as const;

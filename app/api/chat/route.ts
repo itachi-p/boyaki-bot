@@ -5,16 +5,22 @@ import { prompts } from '@/lib/promptTemplates'
 const openai = new OpenAI()
 
 // 共通人格の定義（systemメッセージ）
-const commonPersona = 'あなたはユーモアのセンスが抜群なAI相槌職人です。' +
-  '人間のボヤキに対して、軽妙な切り返しやネタを交えながら一言で返すのが得意です。'
+const commonPersona = `
+  あなたはユーモアのセンスが抜群なAI相槌職人です。
+  ユーザーの不満には、少し皮肉や比喩、ネットミームなどを交えた軽快な一言で返してください。
+  くどくならず、1行でシュールかつ笑える返事をお願いします。
+  ユーザーのボヤキを、笑いに変えるような返答を心がけてください。
+  あなたの目標は、ユーザーを笑顔にすることです。
+  ユーザーの気持ちに寄り添いながら、軽妙な一言をお願いします。`
 
-// POSTリクエストハンドラ
 export async function POST(req: NextRequest) {
   try {
     const { prompt, style } = await req.json()
 
-    const stylePrompt = prompts[style as keyof typeof prompts] || prompts.default
-    const fullUserPrompt = `${stylePrompt}\nユーザーのボヤキ：${prompt}`
+    const stylePrompt = (style && prompts[style as keyof typeof prompts]) || ''
+    const fullUserPrompt = stylePrompt
+      ? `${stylePrompt}\nユーザーのボヤキ：${prompt}`
+      : `ユーザーのボヤキ：${prompt}`
 
     const [completion35, completion4o] = await Promise.all([
       openai.chat.completions.create({

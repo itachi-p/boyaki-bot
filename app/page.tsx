@@ -4,10 +4,11 @@ import { useState } from 'react'
 import styles from './page.module.css'
 
 const styleOptions = [
-  { key: 'default', label: '標準（軽妙ユーモア）' },
-  { key: 'kansai', label: '関西弁' },
-  { key: 'cat', label: '猫語' },
+  { key: 'default', label: '標準' },
+  { key: 'kansai', label: '関西のおばちゃん' },
+  { key: 'cat', label: '半獣猫人' },
   { key: 'internetOld', label: 'インターネット老人会' },
+  { key: 'downer', label: '脱力系' },
 ]
 
 export default function Home() {
@@ -19,8 +20,11 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async () => {
+    if (!userInput.trim()) return
     setLoading(true)
     setError(null)
+    setResponse35('')
+    setResponse4o('')
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -31,7 +35,7 @@ export default function Home() {
         }),
       })
 
-      if (!res.ok) throw new Error('API request failed')
+      if (!res.ok) throw new Error(`API request failed: ${res.status}`)
 
       const data = await res.json()
       setResponse35(data.result_35 || '')
@@ -55,7 +59,8 @@ export default function Home() {
         placeholder="ここにボヤキを入力してください"
         value={userInput}
         onChange={(e) => setUserInput(e.target.value)}
-        className="w-full h-14 p-2 border rounded mb-4 text-black bg-white resize-none"
+        className="w-full h-20 p-2 border rounded mb-4 text-black bg-white dark:bg-gray-800 dark:text-white"
+        style={{ resize: 'vertical' }}
       />
 
       <select
@@ -80,15 +85,19 @@ export default function Home() {
 
       {error && <p className="text-red-600 mt-4">{error}</p>}
 
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold">GPT-3.5 の応答:</h2>
-        <p className="p-2 bg-gray-100 text-black rounded">{response35}</p>
-      </div>
+      {response35 && (
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold">GPT-3.5 の応答:</h2>
+          <p className="p-2 bg-gray-100 rounded dark:bg-gray-700 dark:text-white whitespace-pre-wrap">{response35}</p>
+        </div>
+      )}
 
-      <div className="mt-4">
-        <h2 className="text-lg font-semibold">GPT-4o の応答:</h2>
-        <p className="p-2 bg-gray-100 text-black rounded">{response4o}</p>
-      </div>
+      {response4o && (
+        <div className="mt-4">
+          <h2 className="text-lg font-semibold">GPT-4o の応答:</h2>
+          <p className="p-2 bg-gray-100 rounded dark:bg-gray-700 dark:text-white whitespace-pre-wrap">{response4o}</p>
+        </div>
+      )}
     </main>
   )
 }
