@@ -6,8 +6,8 @@ import styles from './page.module.css'
 const styleOptions = [
   { key: 'default', label: '標準' },
   { key: 'kansai', label: '関西のおばちゃん' },
-  { key: 'cat', label: '半獣猫人' },
-  { key: 'internetOld', label: 'インターネット老人会' },
+  { key: 'nekojin', label: '半獣猫人' },
+  { key: 'roujin', label: 'インターネット老人会' },
   { key: 'downer', label: '脱力系' },
 ]
 
