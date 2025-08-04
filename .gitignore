@@ -1,41 +1,52 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
+# === Node.js / Next.js general ===
+node_modules/
+.next/
+dist/
+out/
+build/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# === OS-specific ===
+.DS_Store
+Thumbs.db
 
-# vercel
-.vercel
+# === Env / keys / local settings ===
+.env
+.env.local
+.env.*.local
+*.pem
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# === Editor / IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# === Logs and coverage ===
+coverage/
+*.lcov
+*.log
+logs/
+
+# === Git-specific ===
+*.orig
+*.rej
+
+# === Misc ===
+package-lock.json
+yarn.lock
+.pnpm-lock.yaml
+turbo/
+
+# === Mac-specific ===
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# === Optional: Custom project-specific excludes ===
+# public/images/temp/
