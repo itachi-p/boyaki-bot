@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { promptTemplate } from '@/lib/promptTemplates/default'
 
 export default function Home() {
   const [input, setInput] = useState('')
@@ -12,20 +13,14 @@ export default function Home() {
     setLoading(true)
     setResponse('')
 
-    // ユーザー入力を使い、APIに送るプロンプトを作成
-  const prompt = `あなたはユーモアのセンスが抜群なAI相槌職人です。ユーザーの不満には、少し皮肉や比喩、ネットミームなどを交えた軽快な一言で返してください。くどくならず、1行でシュールかつ笑える返事をお願いします。不満：「${input}」 返事：`
+    // 外部プロンプト関数を呼び出してプロンプト文を生成
+    const prompt = promptTemplate(input)
 
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt })  // promptを送信
+      body: JSON.stringify({ prompt }),
     })
-
-    if (!res.ok) {
-      setResponse(`エラー発生: ${res.status} ${res.statusText}`)
-      setLoading(false)
-      return
-    }
 
     const data = await res.json()
     setResponse(data.result.trim())
