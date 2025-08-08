@@ -1,0 +1,16 @@
+{
+  "name": "ぼやきアプリ（仮）",
+  "short_name": "ぼやき",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4a90e2",
+  "description": "ぼやきをスタイル別に返すWebアプリ",
+  "icons": [
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

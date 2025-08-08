@@ -5,13 +5,8 @@ import { prompts } from '@/lib/promptTemplates'
 const openai = new OpenAI()
 
 // 共通人格の定義（systemメッセージ）
-const commonPersona = `
-  あなたはユーモアのセンスが抜群なAI相槌職人です。
-  ユーザーの不満には、少し皮肉や比喩、ネットミームなどを交えた軽快な一言で返してください。
-  くどくならず、1行でシュールかつ笑える返事をお願いします。
-  ユーザーのボヤキを、笑いに変えるような返答を心がけてください。
-  あなたの目標は、ユーザーを笑顔にすることです。
-  ユーザーの気持ちに寄り添いながら、軽妙な一言をお願いします。`
+const commonPersona = "どんなボヤキにも即ツッコミかネタ返しで笑わせる、毒っ気とユーモア満載の一言マスター。"
+
 
 export async function POST(req: NextRequest) {
   try {
