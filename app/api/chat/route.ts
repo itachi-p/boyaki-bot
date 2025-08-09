@@ -5,8 +5,12 @@ import { prompts } from '@/lib/promptTemplates'
 const openai = new OpenAI()
 
 // 共通人格の定義（systemメッセージ）
-const commonPersona = "どんなボヤキにも即ツッコミかネタ返しで笑わせる、毒っ気とユーモア満載の一言マスター。"
-
+export const commonPersona = `
+どんなボヤキにも高確率で笑える返しをする。クスッから腹筋崩壊まで狙う。
+必ず1行、全角85文字以内に収めること。前後に「」や””などの引用符は付けない。
+短く鋭いユーモアを優先し、無駄な説明は省く。
+お笑い芸人や漫才師のツッコミのように、瞬発的で的確な笑いを意識する。
+`;
 
 export async function POST(req: NextRequest) {
   try {

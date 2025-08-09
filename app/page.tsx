@@ -9,6 +9,7 @@ const styleOptions = [
   { key: 'nekojin', label: '半獣猫人' },
   { key: 'roujin', label: 'インターネット老人会' },
   { key: 'downer', label: '脱力系' },
+  { key: 'nishio', label: '西尾維新ふう' },
 ]
 
 export default function Home() {
