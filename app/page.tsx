@@ -1,104 +1,59 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import styles from './page.module.css'
+import { useState } from "react";
 
-const styleOptions = [
-  { key: 'default', label: '標準' },
-  { key: 'kansai', label: '関西のおばちゃん' },
-  { key: 'nekojin', label: '半獣猫人' },
-  { key: 'roujin', label: 'インターネット老人会' },
-  { key: 'downer', label: '脱力系' },
-  { key: 'nishio', label: '西尾維新ふう' },
-]
+type ModelResult = {
+  model: string;
+  response: string;
+};
 
 export default function Home() {
-  const [userInput, setUserInput] = useState('')
-  const [selectedStyle, setSelectedStyle] = useState('default')
-  const [response35, setResponse35] = useState('')
-  const [response4o, setResponse4o] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [input, setInput] = useState("");
+  const [results, setResults] = useState<ModelResult[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    if (!userInput.trim()) return
-    setLoading(true)
-    setError(null)
-    setResponse35('')
-    setResponse4o('')
+  const handleSend = async () => {
+    if (!input.trim()) return;
+    setLoading(true);
     try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: userInput,
-          style: selectedStyle,
-        }),
-      })
-
-      if (!res.ok) throw new Error(`API request failed: ${res.status}`)
-
-      const data = await res.json()
-      setResponse35(data.result_35 || '')
-      setResponse4o(data.result_4o || '')
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message)
-      } else {
-        setError('Unknown error')
-      }
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input }),
+      });
+      const data = await res.json();
+      setResults(data.results || []);
+    } catch (err) {
+      console.error(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <main className={styles.main}>
-      <h1 className="text-2xl font-bold mb-4">AIボヤキ相槌ジェネレーター</h1>
-
+    <main style={{ padding: 20 }}>
+      <h1>GPT-5系 比較テスト</h1>
       <textarea
-        placeholder="ここにボヤキを入力してください"
-        value={userInput}
-        onChange={(e) => setUserInput(e.target.value)}
-        className="w-full h-20 p-2 border rounded mb-4 text-black bg-white dark:bg-gray-800 dark:text-white"
-        style={{ resize: 'vertical' }}
+        rows={4}
+        style={{ width: "100%", marginTop: 10 }}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
       />
-
-      <select
-        value={selectedStyle}
-        onChange={(e) => setSelectedStyle(e.target.value)}
-        className="mb-4 p-2 border rounded"
-      >
-        {styleOptions.map((opt) => (
-          <option key={opt.key} value={opt.key}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-
       <button
-        onClick={handleSubmit}
-        disabled={loading || !userInput.trim()}
-        className="ml-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+        style={{ marginTop: 10 }}
+        onClick={handleSend}
+        disabled={loading}
       >
-        {loading ? '生成中...' : '送信'}
+        {loading ? "送信中..." : "送信"}
       </button>
-
-      {error && <p className="text-red-600 mt-4">{error}</p>}
-
-      {response35 && (
-        <div className="mt-6">
-          <h2 className="text-lg font-semibold">GPT-3.5 の応答:</h2>
-          <p className="p-2 bg-gray-100 rounded dark:bg-gray-700 dark:text-white whitespace-pre-wrap">{response35}</p>
-        </div>
-      )}
-
-      {response4o && (
-        <div className="mt-4">
-          <h2 className="text-lg font-semibold">GPT-4o の応答:</h2>
-          <p className="p-2 bg-gray-100 rounded dark:bg-gray-700 dark:text-white whitespace-pre-wrap">{response4o}</p>
-        </div>
-      )}
+      <div style={{ marginTop: 20 }}>
+        {results.map((r) => (
+          <div key={r.model} style={{ border: "1px solid #ccc", padding: 10 }}>
+            <h3>{r.model}</h3>
+            <p>{r.response}</p>
+          </div>
+        ))}
+      </div>
     </main>
-  )
+  );
 }

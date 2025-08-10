@@ -1,49 +1,54 @@
-import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
-import { prompts } from '@/lib/promptTemplates'
+import { NextResponse } from "next/server";
+import OpenAI from "openai";
+import { commonPersona } from "@/lib/commonPersona";
 
-const openai = new OpenAI()
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
-// 共通人格の定義（systemメッセージ）
-export const commonPersona = `
-どんなボヤキにも高確率で笑える返しをする。クスッから腹筋崩壊まで狙う。
-必ず1行、全角85文字以内に収めること。前後に「」や””などの引用符は付けない。
-短く鋭いユーモアを優先し、無駄な説明は省く。
-お笑い芸人や漫才師のツッコミのように、瞬発的で的確な笑いを意識する。
-`;
+const models = ["gpt-5", "gpt-5-mini"] as const;
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
+  if (!process.env.OPENAI_API_KEY) {
+    return NextResponse.json({ error: "Missing API key" }, { status: 500 });
+  }
+
   try {
-    const { prompt, style } = await req.json()
+    const { message } = await req.json();
 
-    const stylePrompt = (style && prompts[style as keyof typeof prompts]) || ''
-    const fullUserPrompt = stylePrompt
-      ? `${stylePrompt}\nユーザーのボヤキ：${prompt}`
-      : `ユーザーのボヤキ：${prompt}`
+    if (!message || typeof message !== "string") {
+      return NextResponse.json({ error: "Invalid message" }, { status: 400 });
+    }
 
-    const [completion35, completion4o] = await Promise.all([
-      openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          { role: 'system', content: commonPersona },
-          { role: 'user', content: fullUserPrompt },
-        ],
-      }),
-      openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: commonPersona },
-          { role: 'user', content: fullUserPrompt },
-        ],
-      }),
-    ])
+    const results = await Promise.all(
+      models.map(async (model) => {
+        const start = Date.now();
+        const completion = await openai.chat.completions.create({
+          model,
+          messages: [
+            { role: "system", content: commonPersona.trim() },
+            { role: "user", content: message }
+          ],
+          max_completion_tokens: 150,
+        });
+        const end = Date.now();
+        const usage = completion.usage;
+        console.log(
+          `[${model}] Time: ${end - start}ms, Tokens:`,
+          usage
+            ? `input=${usage.prompt_tokens}, output=${usage.completion_tokens}, total=${usage.total_tokens}`
+            : "N/A"
+        );
+        return {
+          model,
+          response: completion.choices[0]?.message?.content || ""
+        };
+      })
+    );
 
-    return NextResponse.json({
-      result_35: completion35.choices[0].message.content,
-      result_4o: completion4o.choices[0].message.content,
-    })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ results });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
