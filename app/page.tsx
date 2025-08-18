@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import styles from "./page.module.css";
 
 type ModelResult = {
   model: string;
@@ -31,26 +32,31 @@ export default function Home() {
   };
 
   return (
-    <main style={{ padding: 20 }}>
-      <h1>GPT-5系 比較テスト</h1>
-      <textarea
-        rows={4}
-        style={{ width: "100%", marginTop: 10 }}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
-      <button
-        style={{ marginTop: 10 }}
-        onClick={handleSend}
-        disabled={loading}
+    <main className={styles.container}>
+      <h1 className={styles.title}>GPT-5系 比較テスト</h1>
+      <form
+        className={styles.form}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSend();
+        }}
       >
-        {loading ? "送信中..." : "送信"}
-      </button>
-      <div style={{ marginTop: 20 }}>
+        <input
+          type="text"
+          className={styles.input}
+          placeholder="ボヤいてください"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+        <button type="submit" className={styles.button} disabled={loading}>
+          {loading ? "送信中..." : "送信"}
+        </button>
+      </form>
+      <div className={styles.results}>
         {results.map((r) => (
-          <div key={r.model} style={{ border: "1px solid #ccc", padding: 10 }}>
-            <h3>{r.model}</h3>
-            <p>{r.response}</p>
+          <div key={r.model} className={styles.resultCard}>
+            <h3 className={styles.resultTitle}>{r.model}</h3>
+            <p className={styles.resultText}>{r.response}</p>
           </div>
         ))}
       </div>

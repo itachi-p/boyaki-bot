@@ -22,26 +22,37 @@ export async function POST(req: Request) {
 
     const results = await Promise.all(
       models.map(async (model) => {
-        const start = Date.now();
         const completion = await openai.chat.completions.create({
           model,
           messages: [
             { role: "system", content: commonPersona.trim() },
             { role: "user", content: message }
           ],
-          max_completion_tokens: 150,
+          max_completion_tokens: 128,
+          response_format: { type: "text" }, // ← 強制的にテキスト形式で返す
         });
-        const end = Date.now();
-        const usage = completion.usage;
+
+        const raw = completion.choices[0]?.message?.content ?? "";
+        const responseText = raw.slice(0, 500);
+
+        // デバッグログ
+        console.log("=== API Debug Info ===");
+        console.log("Model:", model);
         console.log(
-          `[${model}] Time: ${end - start}ms, Tokens:`,
-          usage
-            ? `input=${usage.prompt_tokens}, output=${usage.completion_tokens}, total=${usage.total_tokens}`
-            : "N/A"
+          "Tokens: input=%d, output=%d, total=%d",
+          completion.usage?.prompt_tokens,
+          completion.usage?.completion_tokens,
+          completion.usage?.total_tokens
         );
+        console.log("Response text:", responseText);
+        if (!responseText) {
+          console.warn("⚠️ 空レスポンス（raw出力）");
+          // console.dir(completion, { depth: null });
+          console.log(JSON.stringify(completion, null, 2));
+        }
         return {
           model,
-          response: completion.choices[0]?.message?.content || ""
+          response: responseText
         };
       })
     );
